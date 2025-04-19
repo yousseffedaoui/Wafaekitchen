@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonjour chez Wafae</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6e6fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #4b0082;
+        }
+        .main-content {
+            flex: 3;
+            min-width: 300px;
+        }
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .product {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 280px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .product:hover {
+            transform: translateY(-5px);
+        }
+        .product img {
+            max-width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .product-name {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .price {
+            font-weight: bold;
+            color: #4b0082;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .quantity-selector button {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background-color: #4b0082;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .quantity-selector input {
+            width: 40px;
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .add-to-cart {
+            background-color: #4b0082;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        .add-to-cart:hover {
+            background-color: #5a1a8a;
+        }
+        
+        /* Panier */
+        .cart-sidebar {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-left: 20px;
+            position: sticky;
+            top: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .cart-title {
+            font-size: 1.5em;
+            color: #4b0082;
+            margin: 0;
+        }
+        .cart-count {
+            background-color: #4b0082;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+        .cart-items {
+            min-height: 200px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            align-items: center;
+        }
+        .cart-item-info {
+            flex: 2;
+        }
+        .cart-item-name {
+            font-weight: bold;
+        }
+        .cart-item-price {
+            color: #4b0082;
+        }
+        .cart-item-qty {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .cart-item-actions {
+            flex: 1;
+            text-align: right;
+        }
+        .remove-item {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .cart-total {
+            font-weight: bold;
+            font-size: 1.2em;
+            text-align: right;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .checkout-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #4b0082;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+        .checkout-btn:hover {
+            background-color: #5a1a8a;
+        }
+        .empty-cart {
+            color: #888;
+            text-align: center;
+            margin-top: 50px;
+            font-style: italic;
+        }
+        
+        /* Modal de commande */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-title {
+            color: #4b0082;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-actions button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .cancel-btn {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+        .confirm-btn {
+            background-color: #4b0082;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bonjour chez Wafae</h1>
+        <p>Merci d'avoir visité mon site, Veuillez passer votre commande</p>
+    </header>
+
+    <div class="main-content">
+        <div class="product-container">
+          
+            <!-- Produit 1 -->
+            <div class="product" data-id="1" data-name="batbot" data-price="1.5">
+                <img src="produit1.jpg" alt="Huile d'Argan">
+                <div class="batbot (pain poêle)">
+                         <span> batbot (pain poêle) </span>
+                </div>
+                  <div   <span dir="rtl"> البطبوط</span>
+                </div>
+                <div class="price">1.5 $ CAD unité</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 2 -->
+            <div class="product" data-id="2" data-name="Msemen" data-price="2.00">
+                <img src="produit2.jpg" alt="Msemen">
+                <div class="Msemen (crêpe marocaine)">
+                   	 <span> Msemen (crêpe marocaine)</span>
+                </div>
+                <div <span dir="rtl">المسمن</span>
+		</div> 
+                <div class="price">2.00 $ CAD unité</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 3 -->
+            <div class="product" data-id="3" data-name="Pain maison" data-price="2.00">
+                <img src="produit3.jpg" alt="Pain maison">
+                <div class="Pain maison">
+                    <span>Pain maison</span>
+              </div>
+               <div     <span dir="rtl"> خبز الدار </span>
+                </div>
+                <div class="price">2.00 $ CAD unité</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 4 -->
+            <div class="product" data-id="4" data-name="Boite de TAKTOUKA" data-price="10.00">
+                <img src="produit4.jpg" alt="Boite de TAKTOUKA">
+                <div class="Boite de TAKTOUKA">
+                    <span>Boite de TAKTOUKA </span>
+		</div>
+                <div    <span dir="rtl">علبة تكتوكة</span>
+                </div>
+                <div class="price">10.00 $ CAD 250g</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 5 -->
+            <div class="product" data-id="5" data-name="boite des épinards" data-price="10.00">
+                <img src="produit5.jpg" alt="boite des épinards">
+                <div class="boite des épinards">
+                    <span>boite des épinards</span>
+		</div>
+                  <div>  <span dir="rtl"> علبة الخبيزة بالسبانخ </span>
+                </div>
+                <div class="price">10.00 $ CAD 250g </div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 6 -->
+            <div class="product" data-id="6" data-name="CHEBBAKIA" data-price="35.00">
+                <img src="produit6.jpg" alt="CHEBBAKIA ">
+                <div class="CHEBBAKIA">
+                    <span>CHEBBAKIA</span>
+		</div>
+                <div>    <span dir="rtl">الشباكية باللوز</span>
+                </div>
+                <div class="price">35.00 $ CAD 1 KILO</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 7 -->
+            <div class="product" data-id="7" data-name="SELLOU AUX AMANDES" data-price="35.00">
+                <img src="produit7.jpg" alt="SELLOU AUX AMANDES">
+                <div class="SELLOU AUX AMANDES">
+                    <span>SELLOU AUX AMANDES</span>
+		</div>
+                  <div>  <span dir="rtl"> سلو باللوز</span>
+                </div>
+                <div class="price">35.00 $ CAD KILO</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 8 -->
+            <div class="product" data-id="8" data-name="BRIWATE AUX AMANDES" data-price="35.00">
+                <img src="produit8.jpg" alt="BRIWATE AUX AMANDES">
+                <div class="BRIWATE AUX AMANDE">
+                    <span>BRIWATE AUX AMANDES</span>
+		</div>
+                <div>    <span dir="rtl">بريوات باللوز</span>
+                </div>
+                <div class="price">35.00 $ CAD KILO</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 9 -->
+            <div class="product" data-id="9" data-name="PETITE PASTILLA AUX POISSONS" data-price="10.00">
+                <img src="produit9.jpg" alt="PETITE PASTILLA AUX POISSONS">
+                <div class="PETITE PASTILLA  AUX POISSONS">
+                    <span>PETITE PASTILLA  AUX POISSONS</span>
+		</div>
+                <div>    <span dir="rtl"> بسطيلا صغيرة بالسمك</span>
+                </div>
+                <div class="price">10.00 $ CAD unité</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+            <!-- Produit 10 -->
+            <div class="product" data-id="10" data-name="PETITE PASTILLA AU POULET" data-price="7.00">
+                <img src="produit10.jpg" alt="PETITE PASTILLA AU POULET">
+                <div class="PETITE PASTILLA AU POULET">
+                    <span> PETITE PASTILLA AU POULET</span>
+                </div>
+                <div    <span dir="rtl">بسطيلا صغيرة بالدجاج</span>
+                </div>
+                <div class="price">7.00 $ CAD unité</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+          
+            <!-- Produit 11 -->
+            <div class="product" data-id="10" data-name="MSEMEN FOURRÉ" data-price="3.00">
+                <img src="produit11.jpg" alt="MSEMEN FOURRÉ">
+                <div class="MSEMEN FOURRÉ">
+                    <span> MSEMEN FOURRÉ</span>
+                </div>
+                <div    <span dir="rtl">مسمن معمر</span>
+                </div>
+                <div class="price">3.00 $ CAD unité</div>
+                <div class="quantity-selector">
+                    <button class="decrement">-</button>
+                    <input type="number" class="product-qty" value="0" min="0">
+                    <button class="increment">+</button>
+                </div>
+                <button class="add-to-cart">Ajouter au panier</button>
+            </div>
+
+           
+        </div>
+    </div>
+
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h2 class="cart-title">Votre Panier</h2>
+            <div class="cart-count" id="cart-count">0</div>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <div class="empty-cart">Votre panier est vide</div>
+        </div>
+        <div class="cart-total">
+            Total: <span id="cart-total">0.00</span> $ CAD
+        </div>
+        <button class="checkout-btn" id="checkout-btn">Passer la commande</button>
+    </div>
+
+    <!-- Modal de confirmation de commande -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Informations client</h2>
+            <form id="customer-form">
+                <div class="form-group">
+                    <label for="customer-name">Nom complet*</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone">Téléphone*</label>
+                    <input type="tel" id="customer-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-email">Email</label>
+                    <input type="email" id="customer-email">
+                </div>
+                <div class="form-group">
+                    <label for="customer-address">Adresse postale*</label>
+                    <textarea id="customer-address" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Récapitulatif de commande</label>
+                    <div id="order-summary" style="background:#f9f9f9;padding:10px;border-radius:5px;"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" id="cancel-order">Annuler</button>
+                    <button type="submit" class="confirm-btn">Confirmer la commande</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let cart = [];
+            
+            // Gestion des quantités
+            document.querySelectorAll('.quantity-selector').forEach(selector => {
+                const input = selector.querySelector('input');
+                const decrement = selector.querySelector('.decrement');
+                const increment = selector.querySelector('.increment');
+                
+                decrement.addEventListener('click', () => {
+                    if (parseInt(input.value) > 0) {
+                        input.value = parseInt(input.value) - 1;
+                    }
+                });
+                
+                increment.addEventListener('click', () => {
+                    input.value = parseInt(input.value) + 1;
+                });
+            });
+            
+            // Ajout au panier
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const product = this.closest('.product');
+                    const id = product.getAttribute('data-id');
+                    const name = product.getAttribute('data-name');
+                    const price = parseFloat(product.getAttribute('data-price'));
+                    const quantity = parseInt(product.querySelector('.product-qty').value);
+                    
+                    if (quantity > 0) {
+                        addToCart(id, name, price, quantity);
+                        product.querySelector('.product-qty').value = 0;
+                    }
+                });
+            });
+            
+            // Fonction pour ajouter au panier
+            function addToCart(id, name, price, quantity) {
+                const existingItem = cart.find(item => item.id === id);
+                
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cart.push({
+                        id,
+                        name,
+                        price,
+                        quantity
+                    });
+                }
+                
+                updateCart();
+            }
+            
+            // Mise à jour du panier
+            function updateCart() {
+                const cartItems = document.getElementById('cart-items');
+                const cartTotal = document.getElementById('cart-total');
+                const cartCount = document.getElementById('cart-count');
+                
+                let total = 0;
+                let itemCount = 0;
+                
+                if (cart.length === 0) {
+                    cartItems.innerHTML = '<div class="empty-cart">Votre panier est vide</div>';
+                } else {
+                    cartItems.innerHTML = '';
+                    
+                    cart.forEach(item => {
+                        const itemTotal = item.price * item.quantity;
+                        total += itemTotal;
+                        itemCount += item.quantity;
+                        
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'cart-item';
+                        itemElement.innerHTML = `
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-price">${item.price.toFixed(2)} $ CAD</div>
+                                <div class="cart-item-qty">Quantité: ${item.quantity}</div>
+                            </div>
+                            <div class="cart-item-actions">
+                                <button class="remove-item" data-id="${item.id}">×</button>
+                            </div>
+                        `;
+                        cartItems.appendChild(itemElement);
+                    });
+                    
+                    // Ajout des événements de suppression
+                    document.querySelectorAll('.remove-item').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            removeFromCart(id);
+                        });
+                    });
+                }
+                
+                cartTotal.textContent = total.toFixed(2);
+                cartCount.textContent = itemCount;
+            }
+            
+            // Suppression d'un article
+            function removeFromCart(id) {
+                cart = cart.filter(item => item.id !== id);
+                updateCart();
+            }
+            
+            // Gestion de la commande
+            const orderModal = document.getElementById('order-modal');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const cancelOrderBtn = document.getElementById('cancel-order');
+            const customerForm = document.getElementById('customer-form');
+            
+            checkoutBtn.addEventListener('click', function() {
+                if (cart.length === 0) {
+                    alert('Votre panier est vide');
+                    return;
+                }
+                
+                // Afficher le récapitulatif dans le modal
+                let summaryHTML = '<ul>';
+                let total = 0;
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    summaryHTML += `<li>${item.name} - ${item.quantity} x ${item.price.toFixed(2)} $ CAD = ${itemTotal.toFixed(2)} $ CAD</li>`;
+                });
+                
+                summaryHTML += `</ul><p><strong>Total: ${total.toFixed(2)} $ CAD</strong></p>`;
+                document.getElementById('order-summary').innerHTML = summaryHTML;
+                
+                // Afficher le modal
+                orderModal.style.display = 'flex';
+            });
+            
+            cancelOrderBtn.addEventListener('click', function() {
+                orderModal.style.display = 'none';
+            });
+            
+            customerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Récupérer les infos client
+                const customerName = document.getElementById('customer-name').value;
+                const customerPhone = document.getElementById('customer-phone').value;
+                const customerEmail = document.getElementById('customer-email').value;
+                const customerAddress = document.getElementById('customer-address').value;
+                
+                // Préparer les détails de la commande
+                let orderDetails = 'Détails de la commande:\n\n';
+                let total = 0;
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    orderDetails += `${item.name} - ${item.quantity} x ${item.price.toFixed(2)} $ CAD = ${itemTotal.toFixed(2)} $ CAD\n`;
+                });
+                
+                orderDetails += `\nTotal: ${total.toFixed(2)} $ CAD\n\n`;
+                orderDetails += `Informations client:\n`;
+                orderDetails += `Nom: ${customerName}\n`;
+                orderDetails += `Téléphone: ${customerPhone}\n`;
+                orderDetails += `Email: ${customerEmail}\n`;
+                orderDetails += `Adresse: ${customerAddress}`;
+                
+                // Envoyer par email
+                fetch('https://formsubmit.co/ajax/yousseffedaoui@gmail.com', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: customerName,
+                        phone: customerPhone,
+                        email: customerEmail,
+                        address: customerAddress,
+                        order: orderDetails,
+                        _subject: 'Nouvelle commande sur Wafae Shop'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Votre commande a été envoyée avec succès! Merci.');
+                    // Réinitialiser
+                    cart = [];
+                    updateCart();
+                    customerForm.reset();
+                    orderModal.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue. Veuillez réessayer.');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
